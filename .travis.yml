@@ -1,0 +1,30 @@
+language: "perl"
+
+perl:
+  - "5.10"
+
+env:
+  - COVERALLS=false
+
+sudo: required
+services:
+  - docker
+
+
+before_install:
+    - docker pull robsyme/docker-sge
+    - git clone --depth 1 https://github.com/Ensembl/ensembl-hive
+    - perl -version
+    - env
+
+install:
+    - cpanm -v --installdeps --notest .
+    - cpanm -n Devel::Cover::Report::Coveralls
+    - cpanm -n Devel::Cover::Report::Codecov
+    - export PERL5LIB=$PWD/bioperl-live:$PWD/modules:$PWD/deps
+    - export EHIVE_TEST_PIPELINE_URLS='mysql://travis@127.0.0.1/'
+    - docker run -d -i robsyme/docker-sge
+
+script:
+    - prove -rv t
+
