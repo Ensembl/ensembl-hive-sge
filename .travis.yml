@@ -19,7 +19,7 @@ before_install:
 
 install:
     - export PERL5LIB=$PWD/ensembl-hive/modules:$PWD/modules
-    - export EHIVE_TEST_PIPELINE_URLS='mysql://travis@127.0.0.1/'
+    - export EHIVE_TEST_PIPELINE_URLS='sqlite:///'
     - docker run -d -i robsyme/docker-sge
     - cd ensembl-hive
     - cpanm -v --installdeps --notest .
