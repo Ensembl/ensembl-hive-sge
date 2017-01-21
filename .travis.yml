@@ -18,12 +18,11 @@ before_install:
     - env
 
 install:
-    - cpanm -v --installdeps --notest .
-    - cpanm -n Devel::Cover::Report::Coveralls
-    - cpanm -n Devel::Cover::Report::Codecov
-    - export PERL5LIB=$PWD/bioperl-live:$PWD/modules:$PWD/deps
+    - export PERL5LIB=$PWD/ensembl-hive/modules:$PWD/modules
     - export EHIVE_TEST_PIPELINE_URLS='mysql://travis@127.0.0.1/'
     - docker run -d -i robsyme/docker-sge
+    - cd ensembl-hive
+    - cpanm -v --installdeps --notest .
 
 script:
     - prove -rv t
