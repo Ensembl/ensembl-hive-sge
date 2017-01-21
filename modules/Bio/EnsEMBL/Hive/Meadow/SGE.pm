@@ -21,6 +21,10 @@
     is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
     See the License for the specific language governing permissions and limitations under the License.
 
+=head1 EXTERNAL CONTRIBUTION
+
+This module has been written in collaboration between Lel Eory (University of Edinburgh) and Javier Herrero (University College London) based on the LSF.pm module. Hence keeping the same LICENSE note.
+
 =head1 CONTACT
 
     Please subscribe to the Hive mailing list:  http://listserver.ebi.ac.uk/mailman/listinfo/ehive-users  to discuss Hive-related questions or to be notified of our updates
@@ -34,6 +38,7 @@ use strict;
 
 use base ('Bio::EnsEMBL::Hive::Meadow');
 
+use XML::Simple;
 
 sub name {  # also called to check for availability; assume SGE is available if SGE cluster_name can be established
 
@@ -42,6 +47,7 @@ sub name {  # also called to check for availability; assume SGE is available if 
     my $cmd = ((-e $def_cluster) ? "cat $def_cluster" : "qconf -sss");
 
 #    warn "SGE::name() running cmd:\n\t$cmd\n";
+
     if(my $name = `$cmd`) {
         chomp($name);
         return $name;
@@ -54,9 +60,11 @@ sub get_current_worker_process_id {
 
     my $sge_jobid    = $ENV{'JOB_ID'};
     my $sge_jobindex = $ENV{'SGE_TASK_ID'};
+
 #    warn "SGE::get_current_worker_process_id():\n\tjobid: $sge_jobid\n\tjobindex: $sge_jobindex\n";
+
     if(defined($sge_jobid) and defined($sge_jobindex)) {
-        if($sge_jobindex>0) {
+        if ($sge_jobindex > 0) {
             return "$sge_jobid\[$sge_jobindex\]";
         } else {
             return $sge_jobid;
@@ -71,6 +79,7 @@ sub count_pending_workers_by_rc_name {
     my ($self) = @_;
 
     my $jnp = $self->job_name_prefix();
+
 #    warn "SGE::count_pending_workers_by_rc_name(jnp: $jnp)\n";
     
     my %pending_this_meadow_by_rc_name = ();
@@ -91,7 +100,8 @@ sub count_pending_workers_by_rc_name {
 
 
 sub count_running_workers {
-    my ($self) = @_;
+    my $self                        = shift @_;
+    my $meadow_users_of_interest    = shift @_ || [ '*' ];
 
     my $jnp = $self->job_name_prefix();
     
@@ -110,71 +120,46 @@ sub count_running_workers {
 }
 
 
-sub status_of_all_our_workers { 
-    my ($self) = @_;
+sub status_of_all_our_workers { # returns a hashref
+    my $self                        = shift @_;
+    my $meadow_users_of_interest    = shift @_ || [ '*' ];
 
     my $jnp = $self->job_name_prefix();
     my %workers = %{_get_job_hash($jnp)};
+
     my %status_hash = ();
-    while (my ($worker_pid, $worker_hash) = each %workers) {
-       warn("status: $worker_pid - ".$worker_hash->{'state'});
-       $status_hash{$worker_pid} = $worker_hash->{'state'};
+    while (my ($worker_pid, $worker_hash) =  each %workers) {
+        warn("status: $worker_pid - ".$worker_hash->{'state'});
+        $status_hash{$worker_pid} = $worker_hash->{'state'};
     }
+
     return \%status_hash;
 }
 
 
 sub check_worker_is_alive_and_mine {
     my ($self, $worker) = @_;
+
     my $jnp = $self->job_name_prefix();
     my $wpid = $worker->process_id();
     my $this_user = $ENV{'USER'};
     my %workers = %{_get_job_hash($jnp)};
-#    my $cmd = qq{bjobs $wpid -u $this_user 2>&1 | grep -v 'not found' | grep -v JOBID | grep -v EXIT};
+
     my %worker = %{$workers{$wpid}};
-#    warn "SGE::check_worker_is_alive_and_mine($wpid - $this_user)\n";
+
     return ($worker->{'user'} eq $this_user);
 }
 
 
 sub kill_worker {
-    my $worker = pop @_;
-#    my ($wpid, $wtid)=split('[', $worker->process_id());
+    my ($self, $worker, $fast) = @_;
+
     my $wpid = $worker->process_id();
-    #my $cmd = 'bkill '.$worker->process_id();
+
     my $cmd = 'qdel '.$wpid;
-#    $cmd .= " -t $1" if($wtid =~ /(\d+)\]/);
-#    warn "SGE::kill_worker() running cmd:\n\t$cmd\n";
 
     system($cmd);
 }
-
-
-#sub find_out_causes {
-#    my $self = shift @_;
-#
-#    my %lsf_2_hive = (
-#        'TERM_MEMLIMIT' => 'MEMLIMIT',
-#        'TERM_RUNLIMIT' => 'RUNLIMIT',
-#        'TERM_OWNER'    => 'KILLED_BY_USER',
-#    );
-#
-#    my %cod = ();
-#
-#    while (my $pid_batch = join(' ', map { "'$_'" } splice(@_, 0, 20))) {  # can't fit too many pids on one shell cmdline
-#        my $cmd = "bacct -l $pid_batch";
-#
-##        warn "SGE::find_out_causes() running cmd:\n\t$cmd\n";
-#
-#        foreach my $section (split(/\-{10,}\s+/, `$cmd`)) {
-#            if($section=~/^Job <(\d+(?:\[\d+\])?)>.+(TERM_MEMLIMIT|TERM_RUNLIMIT|TERM_OWNER): job killed/) {
-#                $cod{$1} = $lsf_2_hive{$2};
-#            }
-#        }
-#    }
-#
-#    return \%cod;
-#}
 
 
 sub _print_job_list { # private sub to print job info from hashref
@@ -191,6 +176,7 @@ sub _print_job_list { # private sub to print job info from hashref
 
 sub _get_job_hash { # private sub to fetch job info in a hash with LSF-like statuses
     my ($job_name_prefix) = @_;
+    # TODO: Convert this into a global constant!
     # map possible/quasi states between SGE and LSF
     my %state_map = (); 
     $state_map{qw} = $state_map{hqw} = $state_map{hRwq} = 'PEND';
@@ -203,34 +189,112 @@ sub _get_job_hash { # private sub to fetch job info in a hash with LSF-like stat
     $state_map{ds} = $state_map{dS} = $state_map{dT} = $state_map{dRs} = 'DEL';
     $state_map{dRS} = $state_map{dRT} = 'DEL';
 
-    my $cmd = qq(qstat -j "$job_name_prefix*" | grep "job_number\\|job_name" | sed ':a;N;s/job_number: *\\([0-9-]\\+\\)\\n/\\1 /' | sed 's/job_name: *//');
-#    warn "Execute command: $cmd\n";
+    my $qstat = join("", qx"qstat -g d -xml");
+    # This command (qstat -g d -xml) outputs the status of the current jobs for the current user
+    # in XML format. The "-g d" flag outputs the job arrays into single entries, which facilitates
+    # parsing this information.
+    #########################
+    # Example output 1 (no jobs)
+    # $ qstat -g d -xml
+    # <?xml version='1.0'?>
+    # <job_info  xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    #   <queue_info>
+    #   </queue_info>
+    #   <job_info>
+    #   </job_info>
+    # </job_info>
+    #########################
+    # Example output 2 (one single job)
+    # $ qstat -g d -xml
+    # <?xml version='1.0'?>
+    # <job_info  xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    #   <queue_info>
+    #     <job_list state="running">
+    #       <JB_job_number>2188369</JB_job_number>
+    #       <JAT_prio>0.50383</JAT_prio>
+    #       <JB_name>lastz-Hive-default-1</JB_name>
+    #       <JB_owner>regmher</JB_owner>
+    #       <state>r</state>
+    #       <JAT_start_time>2014-11-25T06:36:45</JAT_start_time>
+    #       <queue_name>all.q@larry-3-32.local</queue_name>
+    #       <slots>1</slots>
+    #     </job_list>
+    #   </queue_info>
+    #   <job_info>
+    #   </job_info>
+    # </job_info>
+    #########################
+    # Example output 3 (several running jobs)
+    # <?xml version='1.0'?>
+    # <job_info  xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    #   <queue_info>
+    #     <job_list state="running">
+    #       <JB_job_number>2188039</JB_job_number>
+    #       <JAT_prio>0.50053</JAT_prio>
+    #       <JB_name>lastz-Hive-default-1</JB_name>
+    #       <JB_owner>regmher</JB_owner>
+    #       <state>r</state>
+    #       <JAT_start_time>2014-11-24T22:17:46</JAT_start_time>
+    #       <queue_name>all.q@groucho-1-11.local</queue_name>
+    #       <slots>1</slots>
+    #       <tasks>2</tasks>
+    #     </job_list>
+    #   </queue_info>
+    #   <job_info>
+    #     <job_list state="pending">
+    #       <JB_job_number>2188039</JB_job_number>
+    #       <JAT_prio>0.50020</JAT_prio>
+    #       <JB_name>lastz-Hive-default-1</JB_name>
+    #       <JB_owner>regmher</JB_owner>
+    #       <state>qw</state>
+    #       <JB_submission_time>2014-11-24T22:17:07</JB_submission_time>
+    #       <queue_name></queue_name>
+    #       <slots>1</slots>
+    #       <tasks>9</tasks>
+    #     </job_list>
+    #     <job_list state="pending">
+    #       <JB_job_number>2188039</JB_job_number>
+    #       <JAT_prio>0.50020</JAT_prio>
+    #       <JB_name>lastz-Hive-default-1</JB_name>
+    #       <JB_owner>regmher</JB_owner>
+    #       <state>qw</state>
+    #       <JB_submission_time>2014-11-24T22:17:07</JB_submission_time>
+    #       <queue_name></queue_name>
+    #       <slots>1</slots>
+    #       <tasks>10</tasks>
+    #     </job_list>
+    #   </job_info>
+    # </job_info>
+    #########################
 
-    my %jobs=();
-    foreach my $line (`$cmd`){
-        my ($jid, $jobname) = split(/\s+/, $line);
-        $jobs{$jid} = $jobname;
-    }
+    my $tree = XMLin($qstat);
 
-    $cmd = 'qstat -u "*" -g d'; 
-    my %all_jobs = (); 
-    foreach my $line (`$cmd`){
-        if($line =~ /^(\d+)\s+([.0-9]+)\s+(\S+)\s+(\w+)\s+(\w+)\s+([0-9\/]+ [0-9:]+)\s(\w+@\S+)?\s+(\d+)\s+(\d+)?\s*$/){
-        my($jobid, $prior, $name, $user, $state, $submit, $queue, $slots, $taskid)=($1, $2, $3, $4, $5, $6, $7, $8, $9);
-            if(exists $jobs{$jobid}){
+    my %all_jobs=();
+    while (my ($key1, $value1) = each %$tree) {
+        if (ref($value1) eq "HASH" and $value1->{"job_list"}) {
+            my @jobs;
+            if (ref($value1->{"job_list"}) eq "ARRAY") {
+                @jobs = @{$value1->{"job_list"}};
+            } else {
+                @jobs = ($value1->{"job_list"});
+            }
+            foreach my $this_job (@jobs) {
+                my $jobid = $this_job->{'JB_job_number'};
+                my $taskid = $this_job->{'tasks'};
                 my $jobkey = ($taskid ? $jobid."[$taskid]" : $jobid);
-                %{$all_jobs{$jobkey}} = (); 
-                $all_jobs{$jobkey}->{'jobname'} = $jobs{$jobid};
-                $all_jobs{$jobkey}->{'user'} = $user;
+                my $state = $this_job->{'state'}[1];
+                $all_jobs{$jobkey}->{'jobname'} = $this_job->{'JB_name'};
+                $all_jobs{$jobkey}->{'user'} = $this_job->{'JB_owner'};
                 $all_jobs{$jobkey}->{'state'} = ((exists $state_map{$state}) ? $state_map{$state} : 'UNKWN');
-                $all_jobs{$jobkey}->{'queue'} = $queue;
-                $all_jobs{$jobkey}->{'slots'} = $slots;
+                $all_jobs{$jobkey}->{'queue'} = $this_job->{'queue_name'};
+                $all_jobs{$jobkey}->{'slots'} = $this_job->{'slots'};
                 $all_jobs{$jobkey}->{'taskid'} = $taskid;
-            }   
-        }   
+            }
+        }
     }
+
 #    _print_job_list(\%all_jobs);
-    return \%all_jobs;
+    return \%all_jobs; # returns hashref
 }
 
 
@@ -244,11 +308,10 @@ sub submit_workers {
 
     my $cmd = qq{qsub -b y -cwd $log_stream_args -N "${job_name}" $arr_job_args $rc_specific_submission_cmd_args $meadow_specific_submission_cmd_args $worker_cmd};
 
-#    warn "SGE::submit_workers() running cmd:\n\t$cmd\n";
+    warn "SGE::submit_workers() running cmd:\n\t$cmd\n";
 
     system($cmd) && die "Could not submit job(s): $!, $?";  # let's abort the beekeeper and let the user check the syntax
 
 }
 
 1;
-
