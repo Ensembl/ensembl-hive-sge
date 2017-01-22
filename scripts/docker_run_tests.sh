@@ -19,6 +19,8 @@ export EHIVE_TEST_PIPELINE_URLS='sqlite:///ehive_test_pipeline_db'
 export PATH=$TRAVIS_DIR/perl5/perlbrew/bin:$TRAVIS_DIR/perl5/perlbrew/perls/5.10/bin:$TRAVIS_DIR/bin::$TRAVIS_DIR/.local/bin::$PATH
 export HOME=/home/sgeadmin
 
+mount
+
 echo print_env
 sudo -u sgeadmin -E "PATH=$PATH" env
 echo before
