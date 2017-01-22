@@ -58,7 +58,7 @@ foreach my $long_mult_version ( @pipeline_cfgs ) {
         );
         my $hive_dba    = $pipeline->hive_dba;
 
-        my @beekeeper_cmd = ($ENV{'EHIVE_ROOT_DIR'}.'/scripts/beekeeper.pl', -url => $hive_dba->dbc->url, -sleep => 10, '-loop');
+        my @beekeeper_cmd = ($ENV{'EHIVE_ROOT_DIR'}.'/scripts/beekeeper.pl', -url => $hive_dba->dbc->url, -sleep => 0.2, '-loop');
         system(@beekeeper_cmd);
         ok(!$?, 'beekeeper exited with the return code 0');
 
