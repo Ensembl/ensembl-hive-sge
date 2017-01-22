@@ -20,8 +20,8 @@ export PATH=$TRAVIS_DIR/perl5/perlbrew/bin:$TRAVIS_DIR/perl5/perlbrew/perls/5.10
 export HOME=/home/sgeadmin
 
 echo print_env
-sudo -u sgeadmin -E env
+sudo -u sgeadmin -E "PATH=$PATH" env
 echo before
-sudo -u sgeadmin -E prove -rv $BUILD_DIR/t
+sudo -u sgeadmin -E "PATH=$PATH" prove -rv $BUILD_DIR/t
 echo after
 
