@@ -18,7 +18,6 @@ before_install:
     - env
     - which -a prove
     - head `which prove`
-    - ls /home/travis/.local/bin
 
 install:
     - cpanm -v --installdeps --notest --cpanfile ensembl-hive/cpanfile .
