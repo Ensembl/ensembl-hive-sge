@@ -17,8 +17,10 @@ export EHIVE_ROOT_DIR=$PWD/ensembl-hive
 export PERL5LIB=$EHIVE_ROOT_DIR/modules:$PWD/modules
 export EHIVE_TEST_PIPELINE_URLS='sqlite:///ehive_test_pipeline_db'
 
+useradd -u 1000 -g 1000 -U -d /home/travis -s /bin/bash -c "Fake Travis" travis
+
 echo print_env
-su -ml -c env sgeadmin
+su -ml -c env travis
 echo before
 ls -l /home/travis/build/muffato/ensembl-hive-sge/scripts/travis_run_tests.sh
 #su -ml -c "prove -v $BUILD_DIR/t/" sgeadmin
