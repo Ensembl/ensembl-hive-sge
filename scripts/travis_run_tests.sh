@@ -8,7 +8,7 @@ sudo apt-get update
 sudo apt-get install -y sqlite3
 #sudo apt-get install -y sqlite3 libdbd-sqlite3-perl libdbi-perl libcapture-tiny-perl libxml-simple-perl libdatetime-perl libjson-perl libtest-exception-perl perl-modules libtest-warn-perl
 
-TRAVIS_DIR=/home/sgeadmin/travis
+TRAVIS_DIR=/home/travis
 BUILD_DIR=$TRAVIS_DIR/build/muffato/ensembl-hive-sge/
 cd $BUILD_DIR
 export EHIVE_ROOT_DIR=$PWD/ensembl-hive
