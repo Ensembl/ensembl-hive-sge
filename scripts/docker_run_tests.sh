@@ -22,7 +22,6 @@ export HOME=/home/sgeadmin
 echo print_env
 sudo -u sgeadmin -E "PATH=$PATH" env
 echo before
-sudo -u sgeadmin -E "PATH=$PATH" which -a prove
-sudo -u sgeadmin -E "PATH=$PATH" prove -rv $BUILD_DIR/t
+sudo -u sgeadmin -E "PATH=$PATH" /home/travis/perl5/perlbrew/perls/5.10/bin/prove -rv $BUILD_DIR/t
 echo after
 
