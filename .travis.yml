@@ -16,6 +16,8 @@ before_install:
     - git clone --depth 1 https://github.com/Ensembl/ensembl-hive
     - perl -version
     - env
+    - which -a prove
+    - head `which prove`
 
 install:
     - cpanm -v --installdeps --notest --cpanfile ensembl-hive/cpanfile .
