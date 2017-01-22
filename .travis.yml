@@ -18,7 +18,6 @@ before_install:
     - env
     - which -a prove
     - head `which prove`
-    - ls /home/travis/bin
     - ls /home/travis/.local/bin
 
 install:
