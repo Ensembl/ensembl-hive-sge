@@ -30,7 +30,7 @@ use Bio::EnsEMBL::Hive::Utils ('find_submodules');
 use Bio::EnsEMBL::Hive::Utils::Test qw(init_pipeline runWorker);
 
 # eHive needs this to initialize the pipeline (and run db_cmd.pl)
-$ENV{'EHIVE_ROOT_DIR'} ||= File::Basename::dirname( File::Basename::dirname( File::Basename::dirname( Cwd::realpath($0) ) ) );
+BAIL_OUT('$EHIVE_ROOT_DIR must be defined !') unless $ENV{'EHIVE_ROOT_DIR'};
 
 my $dir = tempdir CLEANUP => 1;
 my $original = chdir $dir;
