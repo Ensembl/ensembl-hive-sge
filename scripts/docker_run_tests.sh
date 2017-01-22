@@ -20,6 +20,8 @@ export EHIVE_TEST_PIPELINE_URLS='sqlite:///ehive_test_pipeline_db'
 echo print_env
 su -ml -c env sgeadmin
 echo before
-su -ml -c "prove -v $BUILD_DIR/t/" sgeadmin
+ls -l /home/travis/build/muffato/ensembl-hive-sge/scripts/travis_run_tests.sh
+#su -ml -c "prove -v $BUILD_DIR/t/" sgeadmin
+su -c /home/travis/build/muffato/ensembl-hive-sge/scripts/travis_run_tests.sh sgeadmin
 echo after
 
