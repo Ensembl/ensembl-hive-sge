@@ -18,12 +18,9 @@ before_install:
     - env
 
 install:
-    - export PERL5LIB=$PWD/ensembl-hive/modules:$PWD/modules
-    - export EHIVE_TEST_PIPELINE_URLS='sqlite:///ehive_test_pipeline_db'
-    - docker run -d -i robsyme/docker-sge
-    - cd ensembl-hive
+    - cpanm -v --installdeps --notest --cpanfile ensembl-hive/cpanfile .
     - cpanm -v --installdeps --notest .
 
 script:
-    - prove -rv t
+    - docker run -v /home/travis:/home/sgeadmin/travis robsyme/docker-sge /home/sgeadmin/travis/build/muffato/ensembl-hive-sge/scripts/travis_run_tests.sh
 
