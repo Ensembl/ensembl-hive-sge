@@ -306,7 +306,7 @@ sub submit_workers {
     my $arr_job_args = (($required_worker_count > 1) ? "-t 1-${required_worker_count}" : '');
     my $log_stream_args = ($submit_log_subdir ? "-o $submit_log_subdir -e $submit_log_subdir" : ''); # use default output/error names & include -cwd for relative path
 
-    my $cmd = qq{qsub -b y -cwd $log_stream_args -N "${job_name}" $arr_job_args $rc_specific_submission_cmd_args $meadow_specific_submission_cmd_args $worker_cmd};
+    my $cmd = qq{qsub -b y -V -cwd $log_stream_args -N "${job_name}" $arr_job_args $rc_specific_submission_cmd_args $meadow_specific_submission_cmd_args $worker_cmd};
 
     warn "SGE::submit_workers() running cmd:\n\t$cmd\n";
 
