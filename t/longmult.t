@@ -69,7 +69,7 @@ foreach my $long_mult_version ( @pipeline_cfgs ) {
         my $final_result_nta = $hive_dba->get_NakedTableAdaptor( 'table_name' => 'final_result' );
         my $final_results = $final_result_nta->fetch_all();
 
-        is(scalar(@$final_results), 3, 'There are exactly 3 final_results');
+        is(scalar(@$final_results), 2, 'There are exactly 2 final_results');
         foreach ( @$final_results ) {
             ok( $_->{'a_multiplier'}*$_->{'b_multiplier'} eq $_->{'result'},
                 sprintf("%s*%s=%s", $_->{'a_multiplier'}, $_->{'b_multiplier'}, $_->{'result'}) );
