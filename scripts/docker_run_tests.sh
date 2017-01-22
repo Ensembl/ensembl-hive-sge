@@ -18,13 +18,8 @@ export PERL5LIB=$EHIVE_ROOT_DIR/modules:$PWD/modules
 export EHIVE_TEST_PIPELINE_URLS='sqlite:///ehive_test_pipeline_db'
 
 echo print_env
-#sudo -u sgeadmin -E "PATH=$PATH" env
-su -m -c env sgeadmin
+su -ml -c env sgeadmin
 echo before
-#sudo -u sgeadmin -E "PATH=$PATH" which -a perl
-#sudo -u sgeadmin -E "PATH=$PATH" /home/travis/perl5/perlbrew/perls/5.10/bin/prove -rv $BUILD_DIR/t
-#find "$BUILD_DIR/t"
-#sudo -u sgeadmin -E prove -v $BUILD_DIR/t/*
-su -m -c "prove -v $BUILD_DIR/t/" sgeadmin
+su -ml -c "prove -v $BUILD_DIR/t/" sgeadmin
 echo after
 
