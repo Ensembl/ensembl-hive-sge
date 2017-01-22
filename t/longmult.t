@@ -27,7 +27,7 @@ use Data::Dumper;
 use File::Temp qw{tempdir};
 
 use Bio::EnsEMBL::Hive::Utils ('find_submodules');
-use Bio::EnsEMBL::Hive::Utils::Test qw(init_pipeline runWorker);
+use Bio::EnsEMBL::Hive::Utils::Test qw(init_pipeline);
 
 # eHive needs this to initialize the pipeline (and run db_cmd.pl)
 BAIL_OUT('$EHIVE_ROOT_DIR must be defined !') unless $ENV{'EHIVE_ROOT_DIR'};
