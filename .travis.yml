@@ -18,11 +18,13 @@ before_install:
     - env
     - which -a prove
     - head `which prove`
+    - ls /home/travis/bin
+    - ls /home/travis/.local/bin
 
 install:
     - cpanm -v --installdeps --notest --cpanfile ensembl-hive/cpanfile .
     - cpanm -v --installdeps --notest .
 
 script:
-    - docker run -v /home/travis:/home/travis robsyme/docker-sge /home/travis/build/muffato/ensembl-hive-sge/scripts/docker_run_tests.sh
+    - docker run -v /home/travis:/home/sgeadmin/travis robsyme/docker-sge /home/travis/build/muffato/ensembl-hive-sge/scripts/docker_run_tests.sh
 
