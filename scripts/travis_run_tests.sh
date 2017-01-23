@@ -17,6 +17,8 @@ export EHIVE_TEST_PIPELINE_URLS='sqlite:///ehive_test_pipeline_db'
 export PATH=$TRAVIS_DIR/perl5/perlbrew/perls/5.10/bin:$PATH
 
 echo before
+ls -l $TRAVIS_DIR/perl5/perlbrew/perls/5.10/bin
+find $TRAVIS_DIR/perl5/perlbrew/ -type f -name perl
 ls -l t
 which -a prove
 which -a perl
