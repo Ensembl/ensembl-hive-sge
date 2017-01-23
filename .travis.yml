@@ -3,28 +3,15 @@ language: "perl"
 perl:
   - "5.10"
 
-env:
-  - COVERALLS=false
-
 sudo: required
 services:
   - docker
 
-
-before_install:
+install:
     - docker pull robsyme/docker-sge
     - git clone --depth 1 https://github.com/Ensembl/ensembl-hive
-    - perl -version
     - env
-    - which -a prove
-    - head `which prove`
-
-install:
-    - cpanm -v --installdeps --notest --cpanfile ensembl-hive/cpanfile .
-    - cpanm -v --installdeps --notest .
 
 script:
     - docker run -v /home/travis:/home/travis robsyme/docker-sge /home/travis/build/muffato/ensembl-hive-sge/scripts/docker_run_tests.sh
-    #- docker run -v /home/travis:/home/travis robsyme/docker-sge su -lc /home/travis/build/muffato/ensembl-hive-sge/scripts/docker_run_tests.sh sgeadmin
-    #- docker run -v /home/travis:/home/travis robsyme/docker-sge su -lc "/bin/bash /home/travis/build/muffato/ensembl-hive-sge/scripts/docker_run_tests.sh" sgeadmin
 

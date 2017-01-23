@@ -18,6 +18,11 @@ export PATH=$TRAVIS_DIR/perl5/perlbrew/perls/5.10/bin:$PATH
 
 echo before
 ls -l t
+which -a prove
+which -a perl
+perl --version
+perl -V
+prove --version
 prove -rv t
 echo after
 
