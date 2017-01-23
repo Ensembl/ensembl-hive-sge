@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Stop the script at the first failure
-set -e
+#set -e
 
 # Install some packages inside the container
 sudo apt-get update
