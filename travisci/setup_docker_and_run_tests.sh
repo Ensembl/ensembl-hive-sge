@@ -17,5 +17,5 @@ apt-get install -qqy sqlite3 libdbd-sqlite3-perl libdbi-perl libcapture-tiny-per
 SGEADMIN_HOME=/home/sgeadmin
 cp -a /home/travis/build/muffato/ensembl-hive-sge $SGEADMIN_HOME
 chown -R sgeadmin: $SGEADMIN_HOME/ensembl-hive-sge
-sudo --login -u sgeadmin $SGEADMIN_HOME/ensembl-hive-sge/scripts/travis_run_tests.sh
+sudo --login -u sgeadmin $SGEADMIN_HOME/ensembl-hive-sge/travisci/run_tests.sh
 

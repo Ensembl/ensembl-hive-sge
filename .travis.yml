@@ -13,5 +13,5 @@ install:
     - env
 
 script:
-    - docker run -v /home/travis:/home/travis robsyme/docker-sge /home/travis/build/muffato/ensembl-hive-sge/scripts/docker_run_tests.sh
+    - docker run -v /home/travis:/home/travis robsyme/docker-sge /home/travis/build/muffato/ensembl-hive-sge/travisci/setup_docker_and_run_tests.sh
 
