@@ -17,7 +17,8 @@ export EHIVE_ROOT_DIR=$PWD/ensembl-hive
 export PERL5LIB=$EHIVE_ROOT_DIR/modules:$PWD/modules
 export EHIVE_TEST_PIPELINE_URLS='sqlite:///ehive_test_pipeline_db'
 
-useradd -u 1000 -g 1000 -U -d /home/travis -s /bin/bash -c "Fake Travis" travis
+group -g 1000 travis
+useradd -u 1000 -g 1000 -d /home/travis -s /bin/bash -c "Fake Travis" travis
 
 echo print_env
 su -ml -c env travis
