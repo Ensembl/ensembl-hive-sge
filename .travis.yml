@@ -25,5 +25,5 @@ install:
 
 script:
     #- docker run -v /home/travis:/home/travis robsyme/docker-sge /home/travis/build/muffato/ensembl-hive-sge/scripts/docker_run_tests.sh
-    - docker run -v /home/travis:/home/travis robsyme/docker-sge su -lc /home/travis/build/muffato/ensembl-hive-sge/scripts/docker_run_tests.sh sgeadmin
+    - docker run -v /home/travis:/home/travis robsyme/docker-sge su -lc "/bin/bash /home/travis/build/muffato/ensembl-hive-sge/scripts/docker_run_tests.sh" sgeadmin
 
