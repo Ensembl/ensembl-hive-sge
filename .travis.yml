@@ -9,7 +9,7 @@ services:
 
 install:
     - docker pull robsyme/docker-sge
-    - git clone --depth 1 https://github.com/Ensembl/ensembl-hive
+    - git clone --depth 1 --branch version/2.4 https://github.com/Ensembl/ensembl-hive
     - env
 
 script:
