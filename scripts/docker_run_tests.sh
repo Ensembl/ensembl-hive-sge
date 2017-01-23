@@ -8,6 +8,13 @@ sudo apt-get update
 #sudo apt-get install -y sqlite3
 sudo apt-get install -qqy sqlite3 libdbd-sqlite3-perl libdbi-perl libcapture-tiny-perl libxml-simple-perl libdatetime-perl libjson-perl libtest-exception-perl perl-modules libtest-warn-perl
 
+echo direct
+sudo -EHi -u sgeadmin /home/travis/build/muffato/ensembl-hive-sge/scripts/travis_run_tests.sh
+cp -a /home/travis/build/muffato/ensembl-hive-sge/scripts/travis_run_tests.sh /root/travis_run_tests.sh
+chmod +x /root/travis_run_tests.sh
+echo copy
+sudo -EHi -u sgeadmin /root/travis_run_tests.sh
+
 #TRAVIS_DIR=/home/travis
 #BUILD_DIR=$TRAVIS_DIR/build/muffato/ensembl-hive-sge
 EHIVE_SGE_DIR=/home/travis/build/muffato/ensembl-hive-sge
