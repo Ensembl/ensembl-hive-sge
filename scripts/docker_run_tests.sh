@@ -25,8 +25,11 @@ echo before
 echo prove -rv $EHIVE_SGE_DIR/t
 cd $EHIVE_SGE_DIR
 ls -l
-#prove -rv t
-su -lmc "prove -rv t" sgeadmin
+#sudo chmod 6755 `which prove`
+#ls -l `which prove`
+sudo -EHi -u sgeadmin PERL5LIB=$PERL5LIB EHIVE_ROOT_DIR=$EHIVE_ROOT_DIR env
+sudo -EHi -u sgeadmin PERL5LIB=$PERL5LIB EHIVE_ROOT_DIR=$EHIVE_ROOT_DIR prove -rv $EHIVE_SGE_DIR/t
+#su -lmc "prove -rv t" sgeadmin
 #su -c /home/travis/build/muffato/ensembl-hive-sge/scripts/travis_run_tests.sh sgeadmin
 #su -lc /home/matthieu/workspace/src/ensembl/ensembl-hive-sge/scripts/docker_run_tests.sh sgeadmin
 echo after
