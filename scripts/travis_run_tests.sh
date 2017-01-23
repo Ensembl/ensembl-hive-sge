@@ -9,6 +9,7 @@ id
 
 TRAVIS_DIR=/home/travis
 BUILD_DIR=$TRAVIS_DIR/build/muffato/ensembl-hive-sge
+BUILD_DIR=/home/sgeadmin/ensembl-hive-sge
 cd $BUILD_DIR
 export EHIVE_ROOT_DIR=$PWD/ensembl-hive
 export PERL5LIB=$EHIVE_ROOT_DIR/modules:$PWD/modules

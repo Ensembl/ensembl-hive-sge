@@ -10,10 +10,11 @@ sudo apt-get install -qqy sqlite3 libdbd-sqlite3-perl libdbi-perl libcapture-tin
 
 echo direct
 sudo -EHi -u sgeadmin /home/travis/build/muffato/ensembl-hive-sge/scripts/travis_run_tests.sh
-cp -a /home/travis/build/muffato/ensembl-hive-sge/scripts/travis_run_tests.sh /home/sgeadmin/travis_run_tests.sh
-chmod +x /home/sgeadmin/travis_run_tests.sh
+cp -a /home/travis/build/muffato/ensembl-hive-sge /home/sgeadmin
+chown -R sgeadmin: /home/sgeadmin/ensembl-hive-sge
+chmod +x /home/sgeadmin/ensembl-hive-sge/scripts/travis_run_tests.sh
 echo copy
-sudo -EHi -u sgeadmin /home/sgeadmin/travis_run_tests.sh
+sudo -EHi -u sgeadmin /home/sgeadmin/ensembl-hive-sge/scripts/travis_run_tests.sh
 
 #TRAVIS_DIR=/home/travis
 #BUILD_DIR=$TRAVIS_DIR/build/muffato/ensembl-hive-sge
