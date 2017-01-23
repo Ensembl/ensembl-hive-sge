@@ -1,9 +1,12 @@
 #!/bin/bash
 
-## This script runs as root
+## This script has to run as root because "/sbin/my_init" (the init system
+## of the Docker image) does things that require root permissions
 
 # Stop the script at the first failure
 set -e
+
+echo "DEBUG: Environment of $0"; env; id; echo "END_DEBUG"
 
 # Install some packages inside the container
 apt-get update
