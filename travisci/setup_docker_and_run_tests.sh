@@ -15,7 +15,7 @@ apt-get install -qqy sqlite3 libdbd-sqlite3-perl libdbi-perl libcapture-tiny-per
 # It seems that non-root users cannot execute anything from /home/travis
 # so we copy the whole directory for the sgeadmin user
 SGEADMIN_HOME=/home/sgeadmin
-cp -a /home/travis/build/muffato/ensembl-hive-sge $SGEADMIN_HOME
+cp -a /home/travis/build/Ensembl/ensembl-hive-sge $SGEADMIN_HOME
 chown -R sgeadmin: $SGEADMIN_HOME/ensembl-hive-sge
 sudo --login -u sgeadmin $SGEADMIN_HOME/ensembl-hive-sge/travisci/run_tests.sh
 
