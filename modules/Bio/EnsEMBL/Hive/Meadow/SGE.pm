@@ -190,7 +190,7 @@ sub _get_job_hash { # private sub to fetch job info in a hash with LSF-like stat
     $state_map{dRS} = $state_map{dRT} = 'DEL';
 
     my $qstat = join("", qx"qstat -g d -xml");
-    warn $qstat;
+    #warn $qstat;
     # This command (qstat -g d -xml) outputs the status of the current jobs for the current user
     # in XML format. The "-g d" flag outputs the job arrays into single entries, which facilitates
     # parsing this information.
