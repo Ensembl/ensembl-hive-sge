@@ -75,86 +75,46 @@ sub get_current_worker_process_id {
 }
 
 
-sub count_pending_workers_by_rc_name {
-    my ($self) = @_;
+sub status_of_all_our_workers { # returns an arrayref
+    my $self                        = shift @_;
+    my $meadow_users_of_interest    = shift @_;
+
+    $meadow_users_of_interest = [ '*' ] unless ($meadow_users_of_interest && scalar(@$meadow_users_of_interest));
+#    warn "SGE::status_of_all_our_workers(jnp: $jnp, users: ".join("/",@$meadow_users_of_interest).")\n";
 
     my $jnp = $self->job_name_prefix();
 
-#    warn "SGE::count_pending_workers_by_rc_name(jnp: $jnp)\n";
-    
-    my %pending_this_meadow_by_rc_name = ();
-    my $total_pending_this_meadow = 0;
-    
-    my %workers = %{_get_job_hash($jnp)};
-    foreach my $worker (values %workers){
-        if($worker->{'state'} eq 'PEND' && $worker->{'jobname'}=~/\Q$jnp\E(\S+)\-\d+/) {
-#            print "RC: $1\n";
-            $pending_this_meadow_by_rc_name{$1}++;
-            $total_pending_this_meadow++;
+    my @status_list = ();
+    foreach my $meadow_user (@$meadow_users_of_interest) {
+        my %workers = %{_get_job_hash($meadow_user)};
+        while (my ($worker_pid, $worker_hash) =  each %workers) {
+            warn("status: $worker_pid - ".$worker_hash->{'state'});
+            my $job_name = $worker_hash->{'jobname'};
+
+            # skip the hive jobs that belong to another pipeline
+            next if (($job_name =~ /Hive-/) and (index($job_name, $jnp) != 0));
+
+            my $rc_name = '__unknown_rc_name__';
+            if ($job_name =~ /^\Q$jnp\E(\S+)\-\d+(\[\d+\])?$/) {
+                $rc_name = $1;
+            }
+
+            push @status_list, [$worker_pid, $worker_hash->{'user'}, $worker_hash->{'state'}, $rc_name];
         }
     }
 
-#    print "Total pending in meadow: $total_pending_this_meadow\n";
-    return (\%pending_this_meadow_by_rc_name, $total_pending_this_meadow);
-}
-
-
-sub count_running_workers {
-    my $self                        = shift @_;
-    my $meadow_users_of_interest    = shift @_ || [ '*' ];
-
-    my $jnp = $self->job_name_prefix();
-    
-#    warn "SGE::count_running_workers(jnp: $jnp, users: ".join("/",@$meadow_users_of_interest).")\n";
-
-    my $run_count = 0;
-
-  foreach my $meadow_user (@$meadow_users_of_interest) {
-    my %workers = %{_get_job_hash($jnp, $meadow_user)};
-    foreach my $worker (values %workers){
-        $run_count++ if($worker->{'state'} eq 'RUN');
-    }
-  }
-
-#    print "Num running in meadow: $run_count\n";
-
-    return $run_count;
-}
-
-
-sub status_of_all_our_workers { # returns a hashref
-    my $self                        = shift @_;
-    my $meadow_users_of_interest    = shift @_ || [ '*' ];
-
-#    warn "SGE::status_of_all_our_workers(users: ".join("/",@$meadow_users_of_interest).")\n";
-
-    my $jnp = $self->job_name_prefix();
-
-    my %status_hash = ();
-
-  foreach my $meadow_user (@$meadow_users_of_interest) {
-    my %workers = %{_get_job_hash($jnp, $meadow_user)};
-    while (my ($worker_pid, $worker_hash) =  each %workers) {
-#        warn("status: $worker_pid - ".$worker_hash->{'state'});
-        $status_hash{$worker_pid} = $worker_hash->{'state'};
-    }
-  }
-
-    return \%status_hash;
+    return \@status_list;
 }
 
 
 sub check_worker_is_alive_and_mine {
     my ($self, $worker) = @_;
 
-    my $jnp = $self->job_name_prefix();
     my $wpid = $worker->process_id();
     my $this_user = $ENV{'USER'};
-    my %workers = %{_get_job_hash($jnp)};
+    my $workers = _get_job_hash($this_user);
 
-    my %worker = %{$workers{$wpid}};
-
-    return ($worker->{'user'} eq $this_user);
+    return exists $workers->{$wpid};
 }
 
 
@@ -182,7 +142,7 @@ sub _print_job_list { # private sub to print job info from hashref
 
 
 sub _get_job_hash { # private sub to fetch job info in a hash with LSF-like statuses
-    my ($job_name_prefix, $meadow_user) = @_;
+    my ($meadow_user) = @_;
     # TODO: Convert this into a global constant!
     # map possible/quasi states between SGE and LSF
     my %state_map = (); 
@@ -196,8 +156,7 @@ sub _get_job_hash { # private sub to fetch job info in a hash with LSF-like stat
     $state_map{ds} = $state_map{dS} = $state_map{dT} = $state_map{dRs} = 'DEL';
     $state_map{dRS} = $state_map{dRT} = 'DEL';
 
-    my $qstat_params = "-g d -xml".($meadow_user ? " -u '$meadow_user'" : "");
-    my $qstat = join("", qx"qstat $qstat_params");
+    my $qstat = join("", qx"qstat -g d -xml -u '$meadow_user'");
     #warn $qstat;
     # This command (qstat -g d -xml) outputs the status of the current jobs for the current user
     # in XML format. The "-g d" flag outputs the job arrays into single entries, which facilitates
@@ -288,7 +247,6 @@ sub _get_job_hash { # private sub to fetch job info in a hash with LSF-like stat
                 @jobs = ($value1->{"job_list"});
             }
             foreach my $this_job (@jobs) {
-                next unless $this_job->{'JB_name'} =~ /\Q$job_name_prefix\E(\S+)\-\d+/;
                 my $jobid = $this_job->{'JB_job_number'};
                 my $taskid = $this_job->{'tasks'};
                 my $jobkey = ($taskid ? $jobid."[$taskid]" : $jobid);
