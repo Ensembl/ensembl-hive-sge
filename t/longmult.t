@@ -21,19 +21,13 @@ use warnings;
 
 use Test::More;
 use Data::Dumper;
-use File::Temp qw{tempdir};
 
-use Bio::EnsEMBL::Hive::Utils::Test qw(init_pipeline);
+use Bio::EnsEMBL::Hive::Utils::Test qw(init_pipeline beekeeper get_test_urls run_sql_on_db);
 
 # eHive needs this to initialize the pipeline (and run db_cmd.pl)
 BAIL_OUT('$EHIVE_ROOT_DIR must be defined !') unless $ENV{'EHIVE_ROOT_DIR'};
 
-my $dir = tempdir CLEANUP => 1;
-my $original = chdir $dir;
-
-my $ehive_test_pipeline_urls = $ENV{'EHIVE_TEST_PIPELINE_URLS'} || 'sqlite:///ehive_test_pipeline_db';
-
-my @pipeline_urls = split( /[\s,]+/, $ehive_test_pipeline_urls ) ;
+my @pipeline_urls = @{get_test_urls()};
 my @pipeline_cfgs = qw(LongMult_conf);
 
 foreach my $long_mult_version ( @pipeline_cfgs ) {
@@ -42,24 +36,17 @@ foreach my $long_mult_version ( @pipeline_cfgs ) {
 
     foreach my $pipeline_url (@pipeline_urls) {
             # override the 'take_time' PipelineWideParameter in the loaded HivePipeline object to make the internal test Worker run quicker:
-        my $url         = init_pipeline(
-                            ($long_mult_version =~ /::/ ? $long_mult_version : 'Bio::EnsEMBL::Hive::Examples::LongMult::PipeConfig::'.$long_mult_version),
-                            [-pipeline_url => $pipeline_url, -hive_force_init => 1],
-                            ['pipeline.param[take_time]=0', 'analysis[take_b_apart].meadow_type=undef'],
-                        );
-
-        my $pipeline = Bio::EnsEMBL::Hive::HivePipeline->new(
-            -url                        => $url,
-            -disconnect_when_inactive   => 1,
+        init_pipeline(
+            ($long_mult_version =~ /::/ ? $long_mult_version : 'Bio::EnsEMBL::Hive::Examples::LongMult::PipeConfig::'.$long_mult_version),
+            $pipeline_url,
+            [],
+            ['pipeline.param[take_time]=0', 'analysis[take_b_apart].meadow_type=undef'],
         );
-        my $hive_dba    = $pipeline->hive_dba;
 
-        my @beekeeper_cmd = ($ENV{'EHIVE_ROOT_DIR'}.'/scripts/beekeeper.pl', -url => $hive_dba->dbc->url, -sleep => 0.2, '-loop');
-        system(@beekeeper_cmd);
-        ok(!$?, 'beekeeper exited with the return code 0');
+        my $hive_dba    = Bio::EnsEMBL::Hive::DBSQL::DBAdaptor->new( -url => $pipeline_url );
 
+        beekeeper($pipeline_url, [-sleep => 0.2, '-loop']);
         is(scalar(@{$hive_dba->get_AnalysisJobAdaptor->fetch_all("status != 'DONE'")}), 0, 'All the jobs could be run');
-
         is(scalar(@{$hive_dba->get_WorkerAdaptor->fetch_all("meadow_type != 'SGE'")}), 0, 'All the workers were run under the SGE meadow');
 
         my $final_result_nta = $hive_dba->get_NakedTableAdaptor( 'table_name' => 'final_result' );
@@ -71,11 +58,10 @@ foreach my $long_mult_version ( @pipeline_cfgs ) {
                 sprintf("%s*%s=%s", $_->{'a_multiplier'}, $_->{'b_multiplier'}, $_->{'result'}) );
         }
 
-        system( @{ $hive_dba->dbc->to_cmd(undef, undef, undef, 'DROP DATABASE') } );
+        $hive_dba->dbc->disconnect_if_idle();
+        run_sql_on_db($pipeline_url, 'DROP DATABASE');
     }
 }
 
 done_testing();
-
-chdir $original;
 
