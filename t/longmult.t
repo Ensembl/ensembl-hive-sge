@@ -19,14 +19,10 @@
 use strict;
 use warnings;
 
-use Cwd;
-use File::Basename;
-
 use Test::More;
 use Data::Dumper;
 use File::Temp qw{tempdir};
 
-use Bio::EnsEMBL::Hive::Utils ('find_submodules');
 use Bio::EnsEMBL::Hive::Utils::Test qw(init_pipeline);
 
 # eHive needs this to initialize the pipeline (and run db_cmd.pl)
