@@ -18,7 +18,8 @@ EHIVE_LOCATION=		# TODO: replace with the path on your machine
 ln -s "$EHIVE_LOCATION" "$SGEADMIN_HOME/ensembl-hive"
 
 # Make this more prominent
-echo -e '\n*******************\n* You probably want to source ensembl-hive-sge/scripts/setup_environment.sh\n*******************\n'
+ln -s ensembl-hive-sge/scripts/quick_start/setup_environment.sh $SGEADMIN_HOME/
+echo -e '\n*******************\n* You probably want to source setup_environment.sh\n*******************\n'
 
 login -f sgeadmin
 
