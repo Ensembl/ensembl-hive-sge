@@ -25,6 +25,48 @@ The module is continuously tested under SGE 8.1.8 thanks to
 (built upon an initial release from [Steve Moss](https://github.com/gawbul)).
 
 
+Testing the SGE meadow
+----------------------
+
+There are two solutions, dubbed "Quick start" and "Custom Docker". With the
+former, the `robsyme/docker-sge` image will be downloaded and prepared for a
+one-time use. With the latter, a prepared Docker image is built and stored
+locally. It can then be used at will: this solution saves a lot of
+resources (disk and time) if you are regularly testing the Meadow.
+
+### Quick start
+
+The scripts are located under `scripts/quick_start`
+in the repo. They start a docker image and mount your own home
+directory in order to share your existing ensembl-hive and ensembl-hive-sge
+checkouts. You need to first edit the `HIVE_SGE_LOCATION` and `EHIVE_LOCATION`
+variables in `setup_docker_and_login_sgeadmin.sh`
+
+Assuming you are in your ensembl-hive-sge checkout:
+
+```
+./scripts/quick_start/start_docker.sh       # run as normal user on your machine. Will start the image as root and login as sgeadmin
+source setup_environment.sh                 # run as "sgeadmin" on the image. Sets up $EHIVE_ROOT_DIR etc
+prove -rv ensembl-hive-sge/t                # run as "sgeadmin" on the image. Uses sqlite
+```
+
+### Custom Docker image
+
+The scripts are located under `scripts/custom-docker` in the repo. There is
+a script to build a docker image, and one to run it. Both are simple wrappers
+around `docker build` and `docker run`, and you might as well run `docker`
+directly. The image will be named `docker-ehive-sge-test`.
+
+You also need to define the `HIVE_SGE_LOCATION` and `EHIVE_LOCATION`
+variables in `scripts/custom-docker/Dockerfile`.
+
+```
+./scripts/custom-docker/build_docker.sh     # run once as a normal user on your machine. Once built, the image will be reused
+./scripts/custom-docker/start_docker.sh     # run as normal user on your machine. Will start the image as root and login as sgeadmin
+source setup_environment.sh                 # run as "sgeadmin" on the image. Sets up $EHIVE_ROOT_DIR etc
+prove -rv ensembl-hive-sge/t                # run as "sgeadmin" on the image. Uses sqlite
+```
+
 Contributors
 ------------
 
