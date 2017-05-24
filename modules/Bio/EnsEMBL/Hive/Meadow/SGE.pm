@@ -36,16 +36,22 @@ This module has been written in collaboration between Lel Eory (University of Ed
 package Bio::EnsEMBL::Hive::Meadow::SGE;
 
 use strict;
+use warnings;
+use XML::Simple;
 
 use base ('Bio::EnsEMBL::Hive::Meadow');
 
-use XML::Simple;
+
+our $VERSION = '4.0';       # Semantic version of the Meadow interface:
+                            #   change the Major version whenever an incompatible change is introduced,
+                            #   change the Minor version whenever the interface is extended, but compatibility is retained.
+
 
 sub name {  # also called to check for availability; assume SGE is available if SGE cluster_name can be established
 
 #    get cluster- or host-name that runs the SGE scheduler
-    my $def_cluster = "$ENV{'SGE_ROOT'}/$ENV{'SGE_CELL'}/common/cluster_name";
-    my $cmd = ((-e $def_cluster) ? "cat $def_cluster" : "qconf -sss");
+    my $def_cluster = ($ENV{'SGE_ROOT'} // '') .'/'. ($ENV{'SGE_CELL'} // '') .'/common/cluster_name';
+    my $cmd = ((-e $def_cluster) ? "cat $def_cluster" : "qconf -sss 2>/dev/null");
 
 #    warn "SGE::name() running cmd:\n\t$cmd\n";
 
