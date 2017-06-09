@@ -40,7 +40,7 @@ foreach my $long_mult_version ( @pipeline_cfgs ) {
             ($long_mult_version =~ /::/ ? $long_mult_version : 'Bio::EnsEMBL::Hive::Examples::LongMult::PipeConfig::'.$long_mult_version),
             $pipeline_url,
             [],
-            ['pipeline.param[take_time]=0', 'analysis[take_b_apart].meadow_type=undef'],
+            ['pipeline.param[take_time]=0', 'analysis[take_b_apart].meadow_type=undef', 'analysis[take_b_apart].analysis_capacity=1'],
         );
 
         my $hive_dba    = Bio::EnsEMBL::Hive::DBSQL::DBAdaptor->new( -url => $pipeline_url );

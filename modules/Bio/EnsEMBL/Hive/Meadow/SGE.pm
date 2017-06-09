@@ -39,10 +39,12 @@ use strict;
 use warnings;
 use XML::Simple;
 
+use Bio::EnsEMBL::Hive::Utils ('split_for_bash');
+
 use base ('Bio::EnsEMBL::Hive::Meadow');
 
 
-our $VERSION = '4.0';       # Semantic version of the Meadow interface:
+our $VERSION = '4.2';       # Semantic version of the Meadow interface:
                             #   change the Major version whenever an incompatible change is introduced,
                             #   change the Minor version whenever the interface is extended, but compatibility is retained.
 
@@ -281,20 +283,44 @@ sub _get_job_hash { # private sub to fetch job info in a hash with LSF-like stat
 }
 
 
-sub submit_workers {
-
+sub submit_workers_return_meadow_pids {
     my ($self, $worker_cmd, $required_worker_count, $iteration, $rc_name, $rc_specific_submission_cmd_args, $submit_log_subdir) = @_;
-    my $job_name                            = $self->job_array_common_name($rc_name, $iteration);
+
+    my $job_array_common_name               = $self->job_array_common_name($rc_name, $iteration);
     my $meadow_specific_submission_cmd_args = $self->config_get('SubmissionOptions');
-    my $arr_job_args = (($required_worker_count > 1) ? "-t 1-${required_worker_count}" : '');
-    my $log_stream_args = ($submit_log_subdir ? "-o $submit_log_subdir -e $submit_log_subdir" : ''); # use default output/error names & include -cwd for relative path
+    my $array_required                      = $required_worker_count > 1;
 
-    my $cmd = qq{qsub -b y -V -cwd $log_stream_args -N "${job_name}" $arr_job_args $rc_specific_submission_cmd_args $meadow_specific_submission_cmd_args $worker_cmd};
+    my @cmd = ('qsub',
+        '-b'    => 'y',                     # the command is to be treated "as a binary"
+        '-V',                               # propagate all ENV variables to the submitted job (off by default)
+        '-cwd',                             # execute the job from the current working directory
+        '-N'    => $job_array_common_name,
+        ($submit_log_subdir ? ('-o' => $submit_log_subdir, '-e' => $submit_log_subdir)  : ()),   # use default output/error names & include -cwd for relative path
+        ($array_required    ? ('-t' => "1-${required_worker_count}")                    : ()),
+        split_for_bash($rc_specific_submission_cmd_args),
+        split_for_bash($meadow_specific_submission_cmd_args),
+        split_for_bash($worker_cmd),
+    );
 
-    warn "SGE::submit_workers() running cmd:\n\t$cmd\n";
+    warn "Executing [ ".$self->signature." ] \t\t".join(' ', @cmd)."\n";
 
-    system($cmd) && die "Could not submit job(s): $!, $?";  # let's abort the beekeeper and let the user check the syntax
+    my $sge_jobid;
 
+    open(my $qsub_output_fh, "-|", @cmd) || die "Could not submit job(s): $!, $?";  # let's abort the beekeeper and let the user check the syntax
+    while(my $line = <$qsub_output_fh>) {
+        if($line=~/^your job(?:-array)? (\d+).+ has been submitted/i) {
+            $sge_jobid = $1;
+        } else {
+            warn $line;     # assuming it is a temporary blockage that might resolve itself with time
+        }
+    }
+    close $qsub_output_fh;
+
+    if($sge_jobid) {
+        return ($array_required ? [ map { $sge_jobid.'['.$_.']' } (1..$required_worker_count) ] : [ $sge_jobid ]);
+    } else {
+        die "Submission unsuccessful\n";
+    }
 }
 
 1;
