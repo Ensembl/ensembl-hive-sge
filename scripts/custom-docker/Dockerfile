@@ -4,9 +4,6 @@
 # Cloned and updated version of the docker-sge container from robsyme
 FROM robsyme/docker-sge
 
-# run everything as root to start with
-USER root
-
 # install required extra software
 RUN apt-get update -y
 RUN apt-get install -y sqlite3 libdbd-sqlite3-perl libdbi-perl libcapture-tiny-perl libxml-simple-perl libdatetime-perl libjson-perl libtest-exception-perl perl-modules libtest-warn-perl
