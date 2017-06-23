@@ -20,6 +20,7 @@ RUN ln -s "$HIVE_SGE_LOCATION" /home/sgeadmin/ensembl-hive-sge
 RUN ln -s "$EHIVE_LOCATION" /home/sgeadmin/ensembl-hive
 RUN ln -s ensembl-hive-sge/scripts/custom-docker/setup_environment.sh /home/sgeadmin/
 
-# start my_init on execution and pass bash to runit
+# start my_init on execution and pass login as sgeadmin, since root is not
+# allowed to submit jobs
 ENTRYPOINT ["/sbin/my_init", "--"]
-CMD ["/bin/bash"]
+CMD ["/bin/login", "-f", "sgeadmin"]
