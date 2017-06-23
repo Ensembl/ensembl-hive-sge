@@ -4,9 +4,6 @@
 # Cloned and updated version of the docker-sge container from robsyme
 FROM robsyme/docker-sge
 
-# maintained by Ensembl
-MAINTAINER Ensembl
-
 # run everything as root to start with
 USER root
 
