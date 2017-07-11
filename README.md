@@ -62,7 +62,6 @@ variables in `scripts/custom-docker/Dockerfile`.
 ```
 ./scripts/custom-docker/build_docker.sh     # run once as a normal user on your machine. Once built, the image will be reused
 ./scripts/custom-docker/start_docker.sh     # run as normal user on your machine. Will start the image as root and login as sgeadmin
-source setup_environment.sh                 # run as "sgeadmin" on the image. Sets up $EHIVE_ROOT_DIR etc
 prove -rv ensembl-hive-sge/t                # run as "sgeadmin" on the image. Uses sqlite
 ```
 
