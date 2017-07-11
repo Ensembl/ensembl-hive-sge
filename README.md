@@ -46,7 +46,6 @@ Assuming you are in your ensembl-hive-sge checkout:
 
 ```
 ./scripts/quick_start/start_docker.sh       # run as normal user on your machine. Will start the image as root and login as sgeadmin
-source setup_environment.sh                 # run as "sgeadmin" on the image. Sets up $EHIVE_ROOT_DIR etc
 prove -rv ensembl-hive-sge/t                # run as "sgeadmin" on the image. Uses sqlite
 ```
 

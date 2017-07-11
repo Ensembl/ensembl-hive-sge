@@ -17,9 +17,12 @@ ln -s "$HIVE_SGE_LOCATION" "$SGEADMIN_HOME/ensembl-hive-sge"
 EHIVE_LOCATION=		# TODO: replace with the path on your machine
 ln -s "$EHIVE_LOCATION" "$SGEADMIN_HOME/ensembl-hive"
 
-# Make this more prominent
-ln -s ensembl-hive-sge/scripts/quick_start/setup_environment.sh $SGEADMIN_HOME/
-echo -e '\n*******************\n* You probably want to source setup_environment.sh\n*******************\n'
+# Setup the environment variables
+export EHIVE_ROOT_DIR=$SGEADMIN_HOME/ensembl-hive
+export PERL5LIB=$EHIVE_ROOT_DIR/modules:$SGEADMIN_HOME/ensembl-hive-sge/modules
+export EHIVE_TEST_PIPELINE_URLS="sqlite:///$SGEADMIN_HOME/"
 
-login -f sgeadmin
+echo -e '\n*******************\n* What about running "prove -rv ensembl-hive-sge/t" ?\n*******************\n'
+
+login -p -f sgeadmin
 
