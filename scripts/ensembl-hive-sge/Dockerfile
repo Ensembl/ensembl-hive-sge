@@ -10,7 +10,7 @@ RUN apt-get update -y \
                           # Taken from ensembl-hive's Dockerfile
     && apt-get install -y cpanminus git build-essential \
                           sqlite3 libdbd-sqlite3-perl postgresql-client libdbd-pg-perl mysql-client libdbd-mysql-perl libdbi-perl \
-                          libcapture-tiny-perl libdatetime-perl libhtml-parser-perl libjson-perl \
+                          libcapture-tiny-perl libdatetime-perl libhtml-parser-perl libjson-perl libproc-daemon-perl \
                           libtest-exception-perl libtest-simple-perl libtest-warn-perl libtest-warnings-perl libtest-file-contents-perl libtest-perl-critic-perl libgraphviz-perl \
                           libgetopt-argvfile-perl libchart-gnuplot-perl libbsd-resource-perl \
     # Extra dependencies for ensembl-hive-sge
