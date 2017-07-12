@@ -23,11 +23,12 @@ apt-get install -y libxml-simple-perl
 # so we copy the whole directory for the sgeadmin user
 SGEADMIN_HOME=/home/sgeadmin
 cp -a /home/travis/build/Ensembl/ensembl-hive-sge $SGEADMIN_HOME
-chown -R sgeadmin: $SGEADMIN_HOME/ensembl-hive-sge
+SGE_CHECKOUT_LOCATION=$SGEADMIN_HOME/ensembl-hive-sge
+chown -R sgeadmin: $SGE_CHECKOUT_LOCATION
 
 # Install the missing dependencies (if any)
-cpanm --installdeps --with-recommends $SGEADMIN_HOME/ensembl-hive-sge/ensembl-hive
-cpanm --installdeps --with-recommends $SGEADMIN_HOME/ensembl-hive-sge
+cpanm --installdeps --with-recommends $SGE_CHECKOUT_LOCATION/ensembl-hive
+cpanm --installdeps --with-recommends $SGE_CHECKOUT_LOCATION
 
-sudo --login -u sgeadmin $SGEADMIN_HOME/ensembl-hive-sge/travisci/run_tests.sh
+sudo --login -u sgeadmin $SGE_CHECKOUT_LOCATION/travisci/run_tests.sh
 
