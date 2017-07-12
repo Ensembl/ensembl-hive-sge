@@ -10,12 +10,24 @@ echo "DEBUG: Environment of $0"; env; id; echo "END_DEBUG"
 
 # Install some packages inside the container
 apt-get update
-apt-get install -qqy sqlite3 libdbd-sqlite3-perl libdbi-perl libcapture-tiny-perl libxml-simple-perl libdatetime-perl libjson-perl libtest-exception-perl perl-modules libtest-warn-perl libproc-daemon-perl
+# Taken from ensembl-hive's Dockerfile
+apt-get install -y cpanminus git build-essential \
+		  sqlite3 libdbd-sqlite3-perl postgresql-client libdbd-pg-perl mysql-client libdbd-mysql-perl libdbi-perl \
+		  libcapture-tiny-perl libdatetime-perl libhtml-parser-perl libjson-perl libproc-daemon-perl \
+		  libtest-exception-perl libtest-simple-perl libtest-warn-perl libtest-warnings-perl libtest-file-contents-perl libtest-perl-critic-perl libgraphviz-perl \
+		  libgetopt-argvfile-perl libchart-gnuplot-perl libbsd-resource-perl
+# Extra dependencies for ensembl-hive-sge
+apt-get install -y libxml-simple-perl
 
 # It seems that non-root users cannot execute anything from /home/travis
 # so we copy the whole directory for the sgeadmin user
 SGEADMIN_HOME=/home/sgeadmin
 cp -a /home/travis/build/Ensembl/ensembl-hive-sge $SGEADMIN_HOME
 chown -R sgeadmin: $SGEADMIN_HOME/ensembl-hive-sge
+
+# Install the missing dependencies (if any)
+cpanm --installdeps --with-recommends $SGEADMIN_HOME/ensembl-hive-sge/ensembl-hive
+cpanm --installdeps --with-recommends $SGEADMIN_HOME/ensembl-hive-sge
+
 sudo --login -u sgeadmin $SGEADMIN_HOME/ensembl-hive-sge/travisci/run_tests.sh
 
