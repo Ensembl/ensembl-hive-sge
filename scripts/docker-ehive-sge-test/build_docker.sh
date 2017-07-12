@@ -2,5 +2,5 @@
 
 THIS_PATH=$(dirname "$(readlink -f "$0")")
 cd "$THIS_PATH"
-docker build -t docker-ehive-sge-test .
+docker build -t docker-ehive-sge-test:2.4 .
 
