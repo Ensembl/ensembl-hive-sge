@@ -20,9 +20,11 @@ checkouts are expected to be on the same branch name to function properly.
   primarily maintain eHive, so both repos may sometimes go out of sync
   until we upgrade the SGE module too
 
-The module is continuously tested under SGE 8.1.8 thanks to
-[Robert Syme's Docker image of SGE](https://github.com/robsyme/docker-sge)
-(built upon an initial release from [Steve Moss](https://github.com/gawbul)).
+The module is continuously tested under SGE 8.1.9 using a [Docker image of
+SGE](https://hub.docker.com/r/robsyme/docker-sge) (contributions from
+[Matthieu Muffato](https://github.com/muffato), [Robert
+Syme's](https://github.com/robsyme) and [Steve
+Moss'](https://github.com/gawbul)).
 
 
 Testing the SGE meadow

@@ -1,7 +1,7 @@
 # Dockerfile to build SGE enabled container with extra packages needed to
 # test eHive
 
-# Cloned and updated version of the docker-sge container from robsyme
+# Cloned and updated version of the docker-sge container
 FROM robsyme/docker-sge
 
 # install required extra software
@@ -32,5 +32,5 @@ ENV PATH "/repo/ensembl-hive/scripts:$PATH"
 ENV PERL5LIB "/repo/ensembl-hive/modules:/repo/ensembl-hive-sge/modules:$PERL5LIB"
 
 # Since the environment is set for the root user, but root is not allowed
-# to submit jobs, we need to login as sgeadmin and preserve the environment
-CMD ["/bin/login", "-p", "-f", "sgeadmin"]
+# to submit jobs, we need to login as sgeuser and preserve the environment
+CMD ["/bin/login", "-p", "-f", "sgeuser"]

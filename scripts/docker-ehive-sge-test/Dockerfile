@@ -19,16 +19,16 @@ ARG EHIVE_LOCATION
 # at build-time, so we can't run cpanm. We hope all the dependencies are
 # correctly installed with the above apt-get commands.
 
-# Place symlinks for ensembl-hive and ensembl-hive-sge in sgeadmin's home directory
-RUN ln -s "$HIVE_SGE_LOCATION" /home/sgeadmin/ensembl-hive-sge
-RUN ln -s "$EHIVE_LOCATION" /home/sgeadmin/ensembl-hive
+# Place symlinks for ensembl-hive and ensembl-hive-sge in sgeuser's home directory
+RUN ln -s "$HIVE_SGE_LOCATION" /home/sgeuser/ensembl-hive-sge
+RUN ln -s "$EHIVE_LOCATION" /home/sgeuser/ensembl-hive
 
-ENV EHIVE_ROOT_DIR "/home/sgeadmin/ensembl-hive"
-ENV PATH "/home/sgeadmin/ensembl-hive/scripts:$PATH"
-ENV PERL5LIB "/home/sgeadmin/ensembl-hive/modules:/home/sgeadmin/ensembl-hive-sge/modules:$PERL5LIB"
-ENV EHIVE_TEST_PIPELINE_URLS='sqlite:////home/sgeadmin/'
+ENV EHIVE_ROOT_DIR "/home/sgeuser/ensembl-hive"
+ENV PATH "/home/sgeuser/ensembl-hive/scripts:$PATH"
+ENV PERL5LIB "/home/sgeuser/ensembl-hive/modules:/home/sgeuser/ensembl-hive-sge/modules:$PERL5LIB"
+ENV EHIVE_TEST_PIPELINE_URLS='sqlite:////home/sgeuser/'
 
 # Since the environment is set for the root user, we need to add the "-p"
-# option to transfer it to "sgeadmin" (only sgeadmin is allowed to submit
+# option to transfer it to "sgeuser" (only sgeuser is allowed to submit
 # jobs)
-CMD ["/bin/login", "-p", "-f", "sgeadmin"]
+CMD ["/bin/login", "-p", "-f", "sgeuser"]
