@@ -20,47 +20,36 @@ checkouts are expected to be on the same branch name to function properly.
   primarily maintain eHive, so both repos may sometimes go out of sync
   until we upgrade the SGE module too
 
-The module is continuously tested under SGE 8.1.8 thanks to
-[Robert Syme's Docker image of SGE](https://github.com/robsyme/docker-sge)
-(built upon an initial release from [Steve Moss](https://github.com/gawbul)).
+The module is continuously tested under SGE 8.1.9 using a [Docker image of
+SGE](https://hub.docker.com/r/robsyme/docker-sge) (contributions from
+[Matthieu Muffato](https://github.com/muffato), [Robert
+Syme's](https://github.com/robsyme) and [Steve
+Moss'](https://github.com/gawbul)).
 
 
 Testing the SGE meadow
 ----------------------
 
-There are two solutions, dubbed "Quick start" and "Custom Docker". With the
-former, the
-[ensemblorg/ensembl-hive-sge](https://hub.docker.com/r/ensemblorg/ensembl-hive-sge)
-image (which contains all the dependencies and checkouts) will be downloaded.
-With the latter, a prepared Docker image is built and stored
-locally, exposing your own checkouts of ensembl-hive and ensembl-hive-sge:
-this solution is more practical
-if you are regularly testing the Meadow.
-
-### Quick start
-
-Just run
+You can use the Docker image
+[ensemblorg/ensembl-hive-sge](https://hub.docker.com/r/ensemblorg/ensembl-hive-sge),
+which contains all the dependencies and checkouts.
 
 ```
-docker run -it ensemblorg/ensembl-hive-sge  # run as normal user on your machine. Will start the image as sgeadmin
-prove -rv ensembl-hive-sge/t                # run as "sgeadmin" on the image. Uses sqlite
+docker run -it ensemblorg/ensembl-hive-sge  # run as normal user on your machine. Will start the image as sgeuser
+prove -rv ensembl-hive-sge/t                # run as "sgeuser" on the image. Uses sqlite
 ```
 
-### Custom Docker image
-
-The scripts are located under `scripts/docker-ehive-sge-test` in the repo. There is
-a script to build a docker image, and one to run it. Both are simple wrappers
-around `docker build` and `docker run`, and you might as well run `docker`
-directly. The image will be named `docker-ehive-sge-test`.
-
-You also need to define the `HIVE_SGE_LOCATION` and `EHIVE_LOCATION`
-variables in `scripts/docker-ehive-sge-test/Dockerfile`.
+To test your own version of the code, you can use
+`scripts/ensembl-hive-sge/start_test_docker.sh`.
+The scriptwill start a new ``ensemblorg/ensembl-hive-sge`` container with
+your own copies of ensembl-hive and ensembl-hive-sge mounted.
 
 ```
-./scripts/docker-ehive-sge-test/build_docker.sh     # run once as a normal user on your machine. Once built, the image will be reused
-./scripts/docker-ehive-sge-test/start_docker.sh     # run as normal user on your machine. Will start the image as sgeadmin
-prove -rv ensembl-hive-sge/t                        # run as "sgeadmin" on the image. Uses sqlite
+scripts/ensembl-hive-sge/start_test_docker.sh /path/to/your/ensembl-hive /path/to/your/ensembl-hive-sge name_of_docker_image
+
 ```
+
+The last argument can be skipped and defaults to `ensemblorg/ensembl-hive-sge`.
 
 Contributors
 ------------
@@ -68,7 +57,8 @@ Contributors
 This module has been written in collaboration between [Lel
 Eory](https://github.com/eorylel) (University of Edinburgh) and [Javier
 Herrero](https://github.com/jherrero) (University College London) based on
-the LSF.pm module.
+the LSF.pm module. The Docker layer has been added by [Matthieu
+Muffato](https://github.com/muffato) (EMBL-EBI).
 
 
 Contact us
