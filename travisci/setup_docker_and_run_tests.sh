@@ -8,14 +8,21 @@ set -e
 
 echo "DEBUG: Environment of $0"; env; id; echo "END_DEBUG"
 
-# Install some packages inside the container
-apt-get update
-apt-get install -qqy sqlite3 libdbd-sqlite3-perl libdbi-perl libcapture-tiny-perl libxml-simple-perl libdatetime-perl libjson-perl libtest-exception-perl perl-modules libtest-warn-perl
-
 # It seems that non-root users cannot execute anything from /home/travis
 # so we copy the whole directory for the sgeuser user
-SGEADMIN_HOME=/home/sgeuser
-cp -a /home/travis/build/Ensembl/ensembl-hive-sge $SGEADMIN_HOME
-chown -R sgeuser: $SGEADMIN_HOME/ensembl-hive-sge
-sudo --login -u sgeuser $SGEADMIN_HOME/ensembl-hive-sge/travisci/run_tests.sh
+SGEUSER_HOME=/home/sgeuser
+cp -a /home/travis/build/Ensembl/ensembl-hive-sge $SGEUSER_HOME
+SGE_CHECKOUT_LOCATION=$SGEUSER_HOME/ensembl-hive-sge
+chown -R sgeuser: $SGE_CHECKOUT_LOCATION
+HIVE_CHECKOUT_LOCATION=$SGE_CHECKOUT_LOCATION/ensembl-hive
+
+# Install extra packages inside the container
+# This is a bit awkward because the helper scripts are not on the 2.4 branch
+curl -O https://raw.githubusercontent.com/Ensembl/ensembl-hive/master/docker/setup_os.Ubuntu-16.04.sh
+curl -O https://raw.githubusercontent.com/Ensembl/ensembl-hive/master/docker/setup_cpan.Ubuntu-16.04.sh
+export DEBIAN_FRONTEND=noninteractive
+/bin/bash ./setup_os.Ubuntu-16.04.sh
+/bin/bash ./setup_cpan.Ubuntu-16.04.sh $HIVE_CHECKOUT_LOCATION $SGE_CHECKOUT_LOCATION
+
+sudo --login -u sgeuser $SGE_CHECKOUT_LOCATION/travisci/run_tests.sh
 

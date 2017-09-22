@@ -4,28 +4,22 @@
 # Cloned and updated version of the docker-sge container
 FROM robsyme/docker-sge
 
-# install required extra software
+# Install git
 ARG DEBIAN_FRONTEND=noninteractive
-RUN apt-get update -y \
-                          # Taken from ensembl-hive's Dockerfile
-    && apt-get install -y cpanminus \
-                          sqlite3 libdbd-sqlite3-perl postgresql-client libdbd-pg-perl mysql-client libdbd-mysql-perl libdbi-perl \
-                          libcapture-tiny-perl libdatetime-perl libhtml-parser-perl libjson-perl \
-                          libtest-exception-perl libtest-simple-perl libtest-warn-perl libtest-warnings-perl libtest-file-contents-perl libtest-perl-critic-perl libgraphviz-perl \
-                          libgetopt-argvfile-perl libchart-gnuplot-perl libbsd-resource-perl \
-    # Extra dependencies for ensembl-hive-sge
-    && apt-get install -y libxml-simple-perl \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+RUN apt-get update -y && apt-get install -y git && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-
+# Clone the repos
 RUN mkdir /repo \
     && git clone -b version/2.4 https://github.com/Ensembl/ensembl-hive.git /repo/ensembl-hive \
     && git clone -b version/2.4 https://github.com/Ensembl/ensembl-hive-sge.git /repo/ensembl-hive-sge
 
-# Install the missing dependencies (if any)
-RUN cpanm --installdeps --with-recommends /repo/ensembl-hive
-RUN cpanm --installdeps --with-recommends /repo/ensembl-hive-sge
+# Install all the dependencies
+# This is a bit awkward because the helper scripts are not on the 2.4 branch
+ADD https://raw.githubusercontent.com/Ensembl/ensembl-hive/master/docker/setup_os.Ubuntu-16.04.sh /root/
+ADD https://raw.githubusercontent.com/Ensembl/ensembl-hive/master/docker/setup_cpan.Ubuntu-16.04.sh /root/
+RUN ["/bin/bash", "/root/setup_os.Ubuntu-16.04.sh"]
+RUN ["/repo/ensembl-hive-sge/scripts/ensembl-hive-sge/setup_os.Ubuntu-16.04.sh"]
+RUN ["/bin/bash", "/root/setup_cpan.Ubuntu-16.04.sh", "/repo/ensembl-hive", "/repo/ensembl-hive-sge"]
 
 ENV EHIVE_ROOT_DIR "/repo/ensembl-hive/"
 ENV PATH "/repo/ensembl-hive/scripts:$PATH"
