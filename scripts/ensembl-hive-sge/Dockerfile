@@ -10,8 +10,8 @@ RUN apt-get update -y && apt-get install -y git && apt-get clean && rm -rf /var/
 
 # Clone the repos
 RUN mkdir /repo \
-    && git clone -b master https://github.com/Ensembl/ensembl-hive.git /repo/ensembl-hive \
-    && git clone -b master https://github.com/Ensembl/ensembl-hive-sge.git /repo/ensembl-hive-sge
+    && git clone -b version/2.5 https://github.com/Ensembl/ensembl-hive.git /repo/ensembl-hive \
+    && git clone -b version/2.5 https://github.com/Ensembl/ensembl-hive-sge.git /repo/ensembl-hive-sge
 
 # Install all the dependencies
 RUN /repo/ensembl-hive/docker/setup_os.Ubuntu-16.04.sh \
