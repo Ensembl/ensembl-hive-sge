@@ -15,8 +15,8 @@ RUN mkdir /repo \
 
 # Install all the dependencies
 # This is a bit awkward because the helper scripts are not on the 2.4 branch
-ADD https://raw.githubusercontent.com/Ensembl/ensembl-hive/master/docker/setup_os.Ubuntu-16.04.sh /root/
-ADD https://raw.githubusercontent.com/Ensembl/ensembl-hive/master/docker/setup_cpan.Ubuntu-16.04.sh /root/
+ADD https://raw.githubusercontent.com/Ensembl/ensembl-hive/version/2.5/docker/setup_os.Ubuntu-16.04.sh /root/
+ADD https://raw.githubusercontent.com/Ensembl/ensembl-hive/version/2.5/docker/setup_cpan.Ubuntu-16.04.sh /root/
 RUN ["/bin/bash", "/root/setup_os.Ubuntu-16.04.sh"]
 RUN ["/repo/ensembl-hive-sge/scripts/ensembl-hive-sge/setup_os.Ubuntu-16.04.sh"]
 RUN ["/bin/bash", "/root/setup_cpan.Ubuntu-16.04.sh", "/repo/ensembl-hive", "/repo/ensembl-hive-sge"]

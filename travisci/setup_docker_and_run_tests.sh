@@ -18,8 +18,8 @@ HIVE_CHECKOUT_LOCATION=$SGE_CHECKOUT_LOCATION/ensembl-hive
 
 # Install extra packages inside the container
 # This is a bit awkward because the helper scripts are not on the 2.4 branch
-curl -O https://raw.githubusercontent.com/Ensembl/ensembl-hive/master/docker/setup_os.Ubuntu-16.04.sh
-curl -O https://raw.githubusercontent.com/Ensembl/ensembl-hive/master/docker/setup_cpan.Ubuntu-16.04.sh
+curl -O https://raw.githubusercontent.com/Ensembl/ensembl-hive/version/2.5/docker/setup_os.Ubuntu-16.04.sh
+curl -O https://raw.githubusercontent.com/Ensembl/ensembl-hive/version/2.5/docker/setup_cpan.Ubuntu-16.04.sh
 export DEBIAN_FRONTEND=noninteractive
 /bin/bash ./setup_os.Ubuntu-16.04.sh
 /bin/bash ./setup_cpan.Ubuntu-16.04.sh $HIVE_CHECKOUT_LOCATION $SGE_CHECKOUT_LOCATION
