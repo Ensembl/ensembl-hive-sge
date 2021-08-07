@@ -2,7 +2,7 @@
 SGE Meadow for eHive
 ====================
 
-[![Build Status](https://travis-ci.org/Ensembl/ensembl-hive-sge.svg?branch=master)](https://travis-ci.org/Ensembl/ensembl-hive-sge)
+[![Build Status](https://travis-ci.org/Ensembl/ensembl-hive-sge.svg?branch=version/2.6)](https://travis-ci.org/Ensembl/ensembl-hive-sge)
 
 [eHive](https://travis-ci.org/Ensembl/ensembl-hive) is a system for running computation pipelines on distributed computing resources - clusters, farms or grids.
 This repository is the implementation of eHive's _Meadow_ interface for the SGE job scheduler (Sun Grid Engine, now
