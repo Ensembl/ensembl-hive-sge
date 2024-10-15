@@ -2,6 +2,13 @@
 SGE Meadow for eHive
 ====================
 
+> [!IMPORTANT]  
+> As per eHive version 2.7.0, all the meadows other than `SLURM` and `Local` are deprecated and not supported anymore.
+> This repository should remain in sync with eHive's `version/2.6`, as we do not plan to apply any change to it.
+> The `main` branch is expected to go out of sync over time as we apply changes to eHive.
+>
+> Please, do not hesitate to contact us, should this be a problem.
+
 [![Build Status](https://travis-ci.org/Ensembl/ensembl-hive-sge.svg?branch=version/2.6)](https://travis-ci.org/Ensembl/ensembl-hive-sge)
 
 [eHive](https://travis-ci.org/Ensembl/ensembl-hive) is a system for running computation pipelines on distributed computing resources - clusters, farms or grids.
@@ -16,7 +23,7 @@ This repository is versioned the same way as eHive itself, and both
 checkouts are expected to be on the same branch name to function properly.
 * `version/2.4`, `version/2.5`, etc. are stable branchs that work with eHive's
   branches of the same name. These branches are _stable_ and _only_ receive bugfixes.
-* `master` is the development branch and follows eHive's `master`. We
+* `main` is the development branch and follows eHive's `main`. We
   primarily maintain eHive, so both repos may sometimes go out of sync
   until we upgrade the SGE module too
 
@@ -65,7 +72,7 @@ Contact us
 ----------
 
 eHive is maintained by the [Ensembl](http://www.ensembl.org/info/about/) project.
-We (Ensembl) are only using Platform LSF to run our computation
+We (Ensembl) are only using SLURM to run our computation
 pipelines, and can only test SGE on the Docker image indicated above.
 Both Lel Eory and Javier Herrero have access to a "real" SGE cluster and
 are better positioned to answer SGE-specific questions.
